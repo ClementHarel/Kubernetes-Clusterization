@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poll-deployment
+  labels:
+    app: poll
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: poll
+  template:
+    metadata:
+      labels:
+        app: poll
+    spec:
+    
+      containers:
+      - name: poll
+        image: epitechcontent/t-dop-600-poll:k8s
+        resources:
+          limits:
+            memory: "128M"
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: poll.configmap
+      restartPolicy: Always
+      

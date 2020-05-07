@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: poll
+  template:
+    metadata:
+      labels:
+        app: poll
+    spec:
+      containers:
+      - name: poll
+        image: postgres:12
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - configMapRef:
+            name: postgres.configmap
+        - secretRef:
+            name: postgres.secret
+      restartPolicy: Always

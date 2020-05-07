@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-deployment
+  labels:
+    app: result
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/e2e-az-name
+                operator: In
+                values:
+                - e2e-az1
+                - e2e-az2
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: another-node-label-key
+                operator: In
+                values:
+                - another-node-label-value
+      containers:
+      - name: result
+        image: epitechcontent/t-dop-600-result:k8s
+        resources:
+          limits:
+            memory: "128M"
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: postgres.configmap
+        - secretRef:
+            name: postgres.secret
+      restartPolicy: Always
